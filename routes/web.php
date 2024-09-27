@@ -1,7 +1,10 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ResponseController;
+use App\Http\Controllers\TicketController;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,9 +21,13 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::resource('users', UserController::class)->only(['index', 'update']);
+Route::resource('tickets', TicketController::class)->only(['index', 'create', 'store']);
+Route::resource('responses', ResponseController::class)->only(['index', 'store']);
+
+Route::get('update-admin/{id}/{status}', [UserController::class, 'update'])->name('makeAdmin');
+Route::get('close-ticket/{id}', [TicketController::class, 'closeTicket'])->name('closeTicket');
+Route::get('responses/create/{ticket}', [ResponseController::class, 'create'])->name('createResponse');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
