@@ -28,19 +28,22 @@
                                 <textarea class="form-control" name="ticket_description" id="ticket_description" rows="3" readonly>{{ $ticket->description }}</textarea>
                             </div>
                             @if ($response)
-                                <textarea class="form-control" rows="3" readonly>{{ $response }}</textarea></textarea>
+                                <label for="response" class="form-label">Admin's Response</label>
+                                <textarea class="form-control" rows="3" readonly>{{ $response }}</textarea>
                             @endif
-                            @if ((auth()->user()->isAdmin == 1) && ($ticket->is_closed == 0) && ($ticket->is_responsed == 0))
-                                <div class="mb-3">
-                                    <label for="response" class="form-label">Admin's Response</label>
-                                    <textarea class="form-control" name="response" id="response" rows="3"></textarea>
-                                </div>
-                                <div class="mb-3">
-                                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                        <button type="submit" class="btn btn-primary">Submit</button>
+                            @can('is-admin')
+                                @if ($ticket->is_closed == 0 && $ticket->is_responsed == 0)
+                                    <div class="mb-3">
+                                        <label for="response" class="form-label">Admin's Response</label>
+                                        <textarea class="form-control" name="response" id="response" rows="3"></textarea>
                                     </div>
-                                </div>
-                            @endif
+                                    <div class="mb-3">
+                                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                            <button type="submit" class="btn btn-primary">Submit</button>
+                                        </div>
+                                    </div>
+                                @endif
+                            @endcan
                         </form>
                     </div>
                 </div>

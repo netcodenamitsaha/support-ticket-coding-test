@@ -15,14 +15,14 @@
                     <x-nav-link :href="route('tickets.index')" :active="request()->routeIs('tickets.*')">
                         {{ __('Tickets') }}
                     </x-nav-link>
-                    @if (auth()->user()->isAdmin == 1)
+                    @admin
                         <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.*')">
                             {{ __('Users') }}
                         </x-nav-link>
                         <x-nav-link :href="route('responses.index')" :active="request()->routeIs('responses.*')">
                             {{ __('Responses') }}
                         </x-nav-link>
-                    @endif
+                    @endadmin
                 </div>
             </div>
 
