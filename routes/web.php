@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ResponseController;
+use App\Http\Controllers\TicketController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -11,8 +15,24 @@ use Illuminate\Support\Facades\Route;
 | routes are loaded by the RouteServiceProvider and all of them will
 | be assigned to the "web" middleware group. Make something great!
 |
-*/
+ */
 
 Route::get('/', function () {
-    return view('welcome');
+	return view('welcome');
 });
+
+Route::resource('users', UserController::class)->only(['index', 'update']);
+Route::resource('tickets', TicketController::class)->only(['index', 'create', 'store']);
+Route::resource('responses', ResponseController::class)->only(['index', 'store']);
+
+Route::get('update-admin/{id}/{status}', [UserController::class, 'update'])->name('makeAdmin')->middleware('admin');
+Route::get('close-ticket/{id}', [TicketController::class, 'closeTicket'])->name('closeTicket')->middleware('admin');
+Route::get('responses/create/{ticket}', [ResponseController::class, 'create'])->name('createResponse');
+
+Route::middleware('auth')->group(function () {
+	Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+	Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+	Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+require __DIR__ . '/auth.php';
