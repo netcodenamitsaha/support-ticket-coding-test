@@ -11,18 +11,18 @@
     </x-slot>
 
     <x-table>
-        @forelse ($tickets as $ticket)
-            <table class="min-w-full table-auto border-collapse text-center">
-                <thead>
-                    <tr class="bg-gray-200 text-left text-sm leading-normal">
-                        <th class="py-3 px-6 font-medium text-gray-600">Sl. no</th>
-                        <th class="py-3 px-6 font-medium text-gray-600">Title</th>
-                        <th class="py-3 px-6 font-medium text-gray-600">Ticket Creator</th>
-                        <th class="py-3 px-6 font-medium text-gray-600">Created At</th>
-                        <th class="py-3 px-6 font-medium text-gray-600">Action</th>
-                    </tr>
-                </thead>
-                <tbody class="text-sm text-gray-700">
+        <table class="min-w-full table-auto border-collapse text-center">
+            <thead>
+                <tr class="bg-gray-200 text-left text-sm leading-normal">
+                    <th class="py-3 px-6 font-medium text-gray-600">Sl. no</th>
+                    <th class="py-3 px-6 font-medium text-gray-600">Title</th>
+                    <th class="py-3 px-6 font-medium text-gray-600">Ticket Creator</th>
+                    <th class="py-3 px-6 font-medium text-gray-600">Created At</th>
+                    <th class="py-3 px-6 font-medium text-gray-600">Action</th>
+                </tr>
+            </thead>
+            <tbody class="text-sm text-gray-700">
+                @forelse ($tickets as $ticket)
                     <tr class="border-b border-gray-200 hover:bg-gray-100">
                         <td class="py-3 px-6">{{ $loop->iteration }}</td>
                         <td class="py-3 px-6">{{ $ticket->title }}</td>
@@ -44,13 +44,15 @@
                             @endif
                         </td>
                     </tr>
-                </tbody>
-            </table>
-        @empty
-            <div class="alert alert-warning mb-0 px-xl-5" role="alert">
-                No data found
-            </div>
-        @endforelse
+                @empty
+                    <tr>
+                        <td colspan="6" class="py-3 px-6 text-center text-gray-600 font-medium text-lg uppercase">
+                            No data found
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
     </x-table>
     {{ $tickets->links() }}
 </x-app-layout>

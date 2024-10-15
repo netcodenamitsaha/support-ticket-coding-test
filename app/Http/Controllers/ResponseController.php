@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Response;
-use App\Models\Ticket;
 use App\Models\User;
-use App\Notifications\TicketRespondedOrClosed;
+use App\Models\Ticket;
+use App\Models\Response;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use App\Notifications\TicketRespondedOrClosed;
 
 class ResponseController extends Controller {
 
@@ -47,10 +48,13 @@ class ResponseController extends Controller {
 		$data['response'] = $request->response;
 		$data['user_id'] = auth()->user()->id;
 
-		Response::create($data);
-		$ticket->update(['is_responded' => 1]);
-
-		$ticket->appliedBy->notify(new TicketRespondedOrClosed($ticket, 'response'));
+		DB::transaction(function () use($data, $ticket) {
+			$response = Response::create($data);
+			$ticket->is_responsed = 1;
+			$ticket->save();
+			$response->appliedBy->notify(new TicketRespondedOrClosed($ticket, 'responded'));
+		});
+		DB::commit();
 		return redirect()->route('responses.index')->with('success', 'Response created successfully!');
 	}
 

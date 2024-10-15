@@ -2,18 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use App\Models\Ticket;
-use Illuminate\Http\Request;
+use App\Models\User;
 use App\Notifications\TicketOpened;
-use Illuminate\Support\Facades\Gate;
 use App\Notifications\TicketRespondedOrClosed;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
 class TicketController extends Controller {
 
 	public function __construct() {
 		$this->middleware('admin')->only(['closeTicket']);
 	}
+
 	/**
 	 * Display a listing of the resource.
 	 */
@@ -44,25 +46,27 @@ class TicketController extends Controller {
 			'description' => ['required', 'string', 'regex:/^[a-zA-Z0-9\s]+$/'],
 		]);
 
-		$data['title'] = $request->title;
+		$data['title']       = $request->title;
 		$data['description'] = $request->description;
-		$data['user_id'] = auth()->user()->id;
-		$data['is_closed'] = 0;
-
-		$ticket = Ticket::create($data);
+		$data['user_id']     = auth()->user()->id;
+		$data['is_closed']   = 0;
 
 		$admins = User::where('isAdmin', 1)->get();
 
-		foreach ($admins as $admin) {
-			$admin->notify(new TicketOpened($ticket));
-		}
+		DB::transaction(function () use ($data, $admins) {
+			$ticket = Ticket::create($data);
+
+			foreach ($admins as $admin) {
+				$admin->notify(new TicketOpened($ticket));
+			}
+		});
 
 		return redirect()->route('tickets.index')->with('success', 'Ticket created successfully!');
 	}
 
 	public function closeTicket(string $id) {
 		$ticket = Ticket::find($id);
-		$user = auth()->user();
+		$user   = auth()->user();
 
 		if (Gate::denies('close-ticket', $user)) {
 			return redirect()->route('tickets.index')->with('error', 'You are not allowed to close this ticket!');
